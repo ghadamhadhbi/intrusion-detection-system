@@ -1,0 +1,21 @@
+# Core Streamlit
+streamlit==1.31.0
+
+# Data Processing
+pandas==2.1.4
+numpy==1.26.3
+
+# Visualization
+plotly==5.18.0
+matplotlib==3.8.2
+seaborn==0.13.1
+
+# Machine Learning (for loading your friend's models)
+scikit-learn==1.4.0
+
+# Additional utilities
+python-dateutil==2.8.2
+pillow==10.2.0
+
+# For reading Excel files if needed
+openpyxl==3.1.2
