@@ -61,6 +61,8 @@ class DataProcessor:
         Returns:
             DataFrame with loaded data
         """
+        import glob
+
         logger.info("Loading dataset...")
         
         if file_path:
@@ -70,18 +72,20 @@ class DataProcessor:
         else:
             # Load all files from config
             raw_path = self.config['paths']['data_raw']
-            files = self.config['dataset']['files']
+            files = glob.glob(os.path.join(raw_path, "**", "*.csv"), recursive=True)
+            print("Files found by glob:", files) 
+
             
             dfs = []
-            for file in files:
-                file_full_path = os.path.join(raw_path, file)
+            for file_full_path in files:
                 if os.path.exists(file_full_path):
                     df_temp = pd.read_csv(file_full_path, encoding='utf-8', low_memory=False)
                     dfs.append(df_temp)
-                    logger.info(f"Loaded {len(df_temp)} records from {file}")
+                    logger.info(f"Loaded {len(df_temp)} records from {os.path.basename(file_full_path)}")
                 else:
                     logger.warning(f"File not found: {file_full_path}")
-            
+            if not dfs:
+                raise ValueError(f"No CSV files were loaded from {raw_path}!")
             df = pd.concat(dfs, ignore_index=True)
             logger.info(f"Total records loaded: {len(df)}")
         
