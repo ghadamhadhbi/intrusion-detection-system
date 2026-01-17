@@ -50,7 +50,7 @@ with st.sidebar:
     # Page selection
     page = st.radio(
         "Navigation",
-        ["📊 Dashboard", "📈 Comparaison des Modèles", "🔍 Analyse des Données", "⚠️ Détection en Temps Réel"]
+        ["📊 Dashboard", "📈 Comparaison des Modèles"]
     )
     
     st.markdown("---")
@@ -227,115 +227,6 @@ elif page == "📈 Comparaison des Modèles":
     else:
         st.warning("⚠️ Aucune métrique disponible.")
 
-# Page: Data Analysis
-elif page == "🔍 Analyse des Données":
-    st.header("🔍 Analyse des Données Réseau")
-    
-    data = load_sample_data()
-    
-    if data is not None:
-        st.success(f"✅ Données chargées: {len(data)} échantillons")
-        
-        # Dataset overview
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            st.metric("Nombre d'échantillons", len(data))
-        with col2:
-            st.metric("Nombre de features", len(data.columns))
-        with col3:
-            if 'label' in data.columns:
-                attack_ratio = (data['label'] != 0).sum() / len(data) * 100
-                st.metric("% Attaques", f"{attack_ratio:.2f}%")
-        
-        # Display sample data
-        st.subheader("📋 Aperçu des Données")
-        st.dataframe(data.head(10), use_container_width=True)
-        
-        # Statistical summary
-        st.subheader("📊 Statistiques Descriptives")
-        st.dataframe(data.describe(), use_container_width=True)
-        
-        # Feature distribution
-        if len(data.columns) > 1:
-            st.subheader("📈 Distribution des Features")
-            
-            numeric_cols = data.select_dtypes(include=[np.number]).columns.tolist()
-            if numeric_cols:
-                selected_feature = st.selectbox("Sélectionnez une feature", numeric_cols)
-                
-                fig = px.histogram(data, x=selected_feature, nbins=50, 
-                                   title=f"Distribution de {selected_feature}")
-                st.plotly_chart(fig, use_container_width=True)
-    else:
-        st.warning("⚠️ Aucune donnée trouvée. Veuillez placer vos fichiers CSV dans le dossier 'data/processed'.")
-
-# Page: Real-time Detection
-elif page == "⚠️ Détection en Temps Réel":
-    st.header("⚠️ Simulation de Détection en Temps Réel")
-    
-    st.info("🔄 Cette section simule la détection d'intrusions en temps réel")
-    
-    # Simulated real-time detection
-    col1, col2 = st.columns([2, 1])
-    
-    with col1:
-        st.subheader("🌐 Trafic Réseau en Direct")
-        
-        # Generate sample data
-        np.random.seed(42)
-        time_points = pd.date_range(end=pd.Timestamp.now(), periods=100, freq='1s')
-        normal_traffic = np.random.normal(50, 10, 80)
-        anomaly_traffic = np.random.normal(150, 30, 20)
-        traffic = np.concatenate([normal_traffic, anomaly_traffic])
-        np.random.shuffle(traffic)
-        
-        df_traffic = pd.DataFrame({
-            'timestamp': time_points,
-            'volume': traffic,
-            'type': ['Normal' if v < 100 else 'Anomalie' for v in traffic]
-        })
-        
-        fig = px.line(df_traffic, x='timestamp', y='volume', color='type',
-                      title="Volume du Trafic Réseau",
-                      color_discrete_map={'Normal': 'blue', 'Anomalie': 'red'})
-        st.plotly_chart(fig, use_container_width=True)
-    
-    with col2:
-        st.subheader("🚨 Alertes Récentes")
-        
-        # Simulated alerts
-        alerts = [
-            {"time": "10:45:32", "type": "DoS Attack", "severity": "Haute", "ip": "192.168.1.105"},
-            {"time": "10:44:15", "type": "Port Scan", "severity": "Moyenne", "ip": "10.0.0.45"},
-            {"time": "10:42:08", "type": "Brute Force", "severity": "Haute", "ip": "172.16.0.89"},
-            {"time": "10:40:55", "type": "Injection SQL", "severity": "Critique", "ip": "192.168.1.200"},
-        ]
-        
-        for alert in alerts:
-            severity_color = {
-                "Critique": "🔴",
-                "Haute": "🟠",
-                "Moyenne": "🟡"
-            }.get(alert['severity'], "⚪")
-            
-            st.markdown(f"""
-            **{severity_color} {alert['type']}**  
-            *{alert['time']}* - IP: `{alert['ip']}`  
-            Sévérité: {alert['severity']}
-            ---
-            """)
-    
-    # Attack type distribution
-    st.subheader("📊 Distribution des Types d'Attaques")
-    
-    attack_types = pd.DataFrame({
-        'Type': ['DoS/DDoS', 'Port Scan', 'Brute Force', 'Injection', 'Botnet', 'Exfiltration'],
-        'Count': [45, 32, 28, 15, 12, 8]
-    })
-    
-    fig = px.pie(attack_types, values='Count', names='Type', 
-                 title="Répartition des Attaques Détectées")
-    st.plotly_chart(fig, use_container_width=True)
 
 # Footer
 st.markdown("---")
